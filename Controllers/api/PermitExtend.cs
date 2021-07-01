@@ -8,6 +8,7 @@ using ePTW.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Newtonsoft.Json;
 
 namespace ePTW.Controllers.api
@@ -150,45 +151,68 @@ namespace ePTW.Controllers.api
 
             if (dto.Id == 0) return BadRequest("Invalid permit.");
 
-            Permit permit = _context.Permits.FirstOrDefault(p => p.Id == dto.Id);
-            if (permit == null)
-                return BadRequest("Permit not found!");
+
             try
             {
-                permit.ToDt = dto.ToDt;
-
-                permit.AllowUserEdit = true;
-                permit.AllowSafetyEdit = true;
-                permit.AllowClose = false;
-
-                permit.DeptInchRelStatus = ReleaseStatus.InRelease;
-                permit.AreaInchRelStatus = ReleaseStatus.InRelease;
-                permit.ElecTechRelStatus = ReleaseStatus.InRelease;
-                permit.ElecInchRelStatus = ReleaseStatus.InRelease;
-                permit.SafetyInchargeRelStatus = ReleaseStatus.InRelease;
-
-                permit.DeptInchEmpId = dto.DeptInchEmpId;
-                permit.AreaInchargeEmpId = dto.AreaInchargeEmpId;
-                permit.VpEmpId = dto.VpEmpId;
-
-                //validate: Dept inch must be VP releaser for permit extend.
-
-                if(dto.ToDt != null && dto.ToDt.Value.TimeOfDay > new TimeSpan(19,00,00))
+                using (IDbContextTransaction transaction = _context.Database.BeginTransaction())
                 {
-                    if (dto.VpEmpId != null)
-                    {
-                        if (!_context.VpReleasers.Any(e => e.EmpUnqId == dto.VpEmpId))
-                            return BadRequest("Dept releaser Id must be of Vice President");
+                    Permit permit = _context.Permits.FirstOrDefault(p => p.Id == dto.Id);
+                    if (permit == null)
+                        return BadRequest("Permit not found!");
 
-                        permit.VpRelStatus = ReleaseStatus.InRelease;
-                    }
-                    else
+                    var history = new PermitHistory();
+
+                    history = _mapper.Map<Permit, PermitHistory>(permit);
+                    history.PermitId = permit.Id;
+                    history.ExtendDate = DateTime.Now;
+                    history.Id = 0;
+
+                    _context.PermitHistories.Add(history);
+                    _context.SaveChanges();
+
+                    permit.OriginalToDate = permit.ToDt;
+                    permit.ExtendFlag = true;
+
+                    permit.ToDt = dto.ToDt;
+
+                    permit.AllowUserEdit = true;
+                    permit.AllowSafetyEdit = true;
+                    permit.AllowClose = false;
+
+                    permit.DeptInchRelStatus = ReleaseStatus.InRelease;
+                    permit.AreaInchRelStatus = ReleaseStatus.InRelease;
+                    permit.ElecTechRelStatus = ReleaseStatus.InRelease;
+                    permit.ElecInchRelStatus = ReleaseStatus.InRelease;
+                    permit.SafetyInchargeRelStatus = ReleaseStatus.InRelease;
+
+                    permit.DeptInchEmpId = dto.DeptInchEmpId;
+                    permit.AreaInchargeEmpId = dto.AreaInchargeEmpId;
+                    permit.VpEmpId = dto.VpEmpId;
+
+                    //validate: Dept inch must be VP releaser for permit extend.
+
+                    if (dto.ToDt != null && dto.ToDt.Value.TimeOfDay > new TimeSpan(19, 00, 00))
                     {
-                        return BadRequest("Vice President release id must be set for permit extend > 7:00 pm.");
+                        if (dto.VpEmpId != null)
+                        {
+                            if (!_context.VpReleasers.Any(e => e.EmpUnqId == dto.VpEmpId))
+                                return BadRequest("Dept releaser Id must be of Vice President");
+
+                            permit.VpRelStatus = ReleaseStatus.InRelease;
+                        }
+                        else
+                        {
+                            return BadRequest("Vice President release id must be set for permit extend > 7:00 pm.");
+                        }
                     }
+
+                    permit.CurrentState = PermitState.PartiallyReleased;
+
+                    _context.SaveChanges();
+
+                    transaction.Commit();
                 }
 
-                _context.SaveChanges();
                 return Ok(dto);
             }
             catch (Exception ex)

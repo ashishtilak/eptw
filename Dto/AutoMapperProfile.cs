@@ -58,6 +58,9 @@ namespace ePTW.Dto
             CreateMap<PermitElecIsolationDto, PermitElecIsolation>();
             CreateMap<PermitHeight, PermitHeightDto>();
             CreateMap<PermitHeightDto, PermitHeight>();
+            CreateMap<PermitHistory, PermitHistoryDto>();
+            CreateMap<PermitHistoryDto, PermitHistory>();
+            CreateMap<Permit, PermitHistory>();
         }
     }
 }

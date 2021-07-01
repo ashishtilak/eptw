@@ -56,6 +56,7 @@ namespace ePTW.Helper
             SyncEmpType(strRemoteServer, location);
             SyncEmp(strRemoteServer, location);
             SyncEmpMail(strRemoteEssServer, location);
+            SyncRelStr(strRemoteEssServer, location);
         }
 
         // sync companies
@@ -885,6 +886,131 @@ namespace ePTW.Helper
                     cmd.ExecuteNonQuery();
 
                     sql = "drop table #tmpEmp";
+                    cmd = new SqlCommand(sql, cnLocal);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error: " + ex);
+            }
+        }
+
+        public static void SyncRelStr(string strRemoteEssServer, string location)
+        {
+            try
+            {
+                using var cnRemote = new SqlConnection(strRemoteEssServer);
+                cnRemote.Open();
+
+                SqlConnection cnLocal;
+
+                using (cnLocal = new SqlConnection(Startup.ConnectionString))
+                {
+                    ///// RELEASE STRATEGY LEVELS
+
+                    var sql = "select top 0 ReleaseStrategy, ReleaseCode into #tmpRelStr from ReleaseStrategyLevels";
+                    cnLocal.Open();
+
+                    var cmd = new SqlCommand(sql, cnLocal);
+                    cmd.ExecuteNonQuery();
+
+                    // WE WILL SELECT RELEASE CODE SAME AS RELEASESTRATEGY BECAUSE IN EPTW, BOTH ARE SAME, IN ESS BOTH ARE DIFF
+
+                    sql =
+                        "select distinct ReleaseStrategy, ReleaseStrategy as ReleaseCode from ReleaseStrategyLevels " +
+                        " where ReleaseGroupCode = 'LA'";
+
+                    var da = new SqlDataAdapter(sql, cnRemote);
+                    var dt = new DataTable();
+                    da.Fill(dt);
+
+                    using (var bulk = new SqlBulkCopy(cnLocal))
+                    {
+                        bulk.DestinationTableName = "#tmpRelStr";
+
+                        bulk.ColumnMappings.Add("ReleaseStrategy", "ReleaseStrategy");
+                        bulk.ColumnMappings.Add("ReleaseCode", "ReleaseCode");
+
+                        bulk.WriteToServer(dt);
+                    }
+
+                    sql = "merge into ReleaseStrategyLevels as target " +
+                          "using #tmpRelStr as Source " +
+                          "on " +
+                          "Target.ReleaseStrategy = Source.ReleaseStrategy and " +
+                          "Target.ReleaseCode = Source.ReleaseCode " +
+                          "when not matched then " +
+                          "insert (ReleaseStrategy, ReleaseCode) " +
+                          "values (source.ReleaseStrategy, source.ReleaseCode) ; ";
+
+                    cmd = new SqlCommand(sql, cnLocal);
+                    cmd.ExecuteNonQuery();
+
+                    sql = "drop table #tmpRelStr";
+                    cmd = new SqlCommand(sql, cnLocal);
+                    cmd.ExecuteNonQuery();
+
+
+                    ///// RELEASE AUTH
+
+                    sql = "select top 0 * into #tmpRelAuth from ReleaseAuth";
+                    // cnLocal.Open();
+
+                    cmd = new SqlCommand(sql, cnLocal);
+                    cmd.ExecuteNonQuery();
+
+                    // SELECT ReleaseStrategy as ReleaseCode as per EPTW
+
+                    sql = "SELECT l.ReleaseStrategy AS ReleaseCode, a.EmpUnqId, a.ValidFrom, a.ValidTo, a.Active " +
+                          "FROM releaseauths a, ReleaseStrategyLevels l " +
+                          "WHERE a.ReleaseCode = l.releasecode " +
+                          "AND l.ReleaseGroupCode = 'LA' " + 
+                          "AND a.Active = 1";
+
+                    da = new SqlDataAdapter(sql, cnRemote);
+                    dt = new DataTable();
+                    da.Fill(dt);
+
+                    using (var bulk = new SqlBulkCopy(cnLocal))
+                    {
+                        bulk.DestinationTableName = "#tmpRelAuth";
+
+                        bulk.ColumnMappings.Add("ReleaseCode", "ReleaseCode");
+                        bulk.ColumnMappings.Add("EmpUnqId", "EmpUnqId");
+                        bulk.ColumnMappings.Add("ValidFrom", "ValidFrom");
+                        bulk.ColumnMappings.Add("ValidTo", "ValidTo");
+                        bulk.ColumnMappings.Add("Active", "Active");
+
+                        bulk.WriteToServer(dt);
+                    }
+
+                    sql = "merge into ReleaseAuth as target " +
+                          "using #tmpRelAuth as Source " +
+                          "on " +
+                          "Target.ReleaseCode = Source.ReleaseCode and " +
+                          "Target.EmpUnqId = Source.EmpUnqId " +
+                          "when matched then " +
+                          "update set " +
+                          "Target.ValidFrom = Source.ValidFrom, " +
+                          "Target.ValidTo = Source.ValidTo, " +
+                          "Target.Active = Source.Active " +
+                          "when not matched then " +
+                          "insert (ReleaseCode, EmpUnqId, ValidFrom, ValidTo, Active) " +
+                          "values (" +
+                          "source.ReleaseCode, " +
+                          "source.EmpUnqId, " +
+                          "source.ValidFrom, " +
+                          "source.ValidTo, " +
+                          "source.Active" +
+                          ") " +
+                          "when not matched by source then " +
+                          "delete ; ";
+
+                    cmd = new SqlCommand(sql, cnLocal);
+                    cmd.ExecuteNonQuery();
+
+                    sql = "drop table #tmpRelAuth";
                     cmd = new SqlCommand(sql, cnLocal);
                     cmd.ExecuteNonQuery();
                 }

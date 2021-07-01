@@ -105,5 +105,7 @@ namespace ePTW.Models
 
         public DbSet<VpReleasers> VpReleasers { get; set; }
         public DbSet<ElecReleasers> ElecReleasers { get; set; }
+
+        public DbSet<PermitHistory> PermitHistories { get; set; }
     }
 }

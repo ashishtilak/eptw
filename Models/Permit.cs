@@ -55,9 +55,8 @@ namespace ePTW.Models
         [StringLength(1)] public string SelfRelStatus { get; set; }
         [Column(TypeName = "datetime2")] public DateTime? SelfRelDate { get; set; }
 
-        
-        [StringLength(10)]
-        public string ResponsiblePerson { get; set; }
+
+        [StringLength(10)] public string ResponsiblePerson { get; set; }
 
         //Release Proc
         public bool DeptInchargeRelReq { get; set; }
@@ -100,7 +99,6 @@ namespace ePTW.Models
         [Column(TypeName = "datetime2")] public DateTime? SafetyInchRelDate { get; set; }
         [StringLength(50)] public string SafetyRemarks { get; set; }
         [StringLength(50)] public string SafetyRejectionRemarks { get; set; }
-
 
 
         // VP Release in case of permit extend
@@ -163,6 +161,9 @@ namespace ePTW.Models
         public PermitElecIsolation ElecIsolationPermit { get; set; }
         public PermitColdWork ColdWorkPermit { get; set; }
         public PermitVesselEntry VesselEntryPermit { get; set; }
+
+        [Column(TypeName = "datetime2")] public DateTime? OriginalToDate { get; set; }
+        public bool ExtendFlag { get; set; }
     }
 
     public enum Choices

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ePTW.Models;
 
 namespace ePTW.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210625101805_ExtendFieldsAdded")]
+    partial class ExtendFieldsAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -918,147 +920,6 @@ namespace ePTW.Migrations
                     b.HasIndex("PermitTypeId");
 
                     b.ToTable("PermitHeight");
-                });
-
-            modelBuilder.Entity("ePTW.Models.PermitHistory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime?>("AreaInchRelDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("AreaInchRelStatus")
-                        .HasMaxLength(1)
-                        .HasColumnType("nvarchar(1)");
-
-                    b.Property<string>("AreaInchRemarks")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("AreaInchargeEmpId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<string>("ChangedByEmpId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<string>("CreatedByEmpId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<DateTime?>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DeptInchEmpId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<DateTime?>("DeptInchRelDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DeptInchRelStatus")
-                        .HasMaxLength(1)
-                        .HasColumnType("nvarchar(1)");
-
-                    b.Property<DateTime?>("ElecInchRelDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ElecInchRelStatus")
-                        .HasMaxLength(1)
-                        .HasColumnType("nvarchar(1)");
-
-                    b.Property<string>("ElecInchRemarks")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("ElecInchargeEmpId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<string>("ElecTechEmpId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<DateTime?>("ElecTechRelDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ElecTechRelStatus")
-                        .HasMaxLength(1)
-                        .HasColumnType("nvarchar(1)");
-
-                    b.Property<string>("ElecTechRemarks")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime>("ExtendDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("FromDt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("FullyReleasedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("HodRemarks")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("JobDescription")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<DateTime?>("LastChangeOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long>("PermitId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("ResponsiblePerson")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<DateTime?>("SafetyInchRelDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("SafetyInchargeEmpId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<string>("SafetyInchargeRelStatus")
-                        .HasMaxLength(1)
-                        .HasColumnType("nvarchar(1)");
-
-                    b.Property<string>("SafetyRejectionRemarks")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("SafetyRemarks")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime?>("SelfRelDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("SelfRelStatus")
-                        .HasMaxLength(1)
-                        .HasColumnType("nvarchar(1)");
-
-                    b.Property<DateTime?>("ToDt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("WorkLocation")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PermitId");
-
-                    b.ToTable("PermitHistory");
                 });
 
             modelBuilder.Entity("ePTW.Models.PermitHotWork", b =>
@@ -2117,17 +1978,6 @@ namespace ePTW.Migrations
                     b.Navigation("Permit");
 
                     b.Navigation("PermitType");
-                });
-
-            modelBuilder.Entity("ePTW.Models.PermitHistory", b =>
-                {
-                    b.HasOne("ePTW.Models.Permit", "Permit")
-                        .WithMany()
-                        .HasForeignKey("PermitId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Permit");
                 });
 
             modelBuilder.Entity("ePTW.Models.PermitHotWork", b =>

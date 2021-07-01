@@ -113,7 +113,8 @@ namespace ePTW.Controllers.api
             {
                 Permit tmp = _context.Permits
                     .Include(p => p.PermitType)
-                    .FirstOrDefault(p => p.Id == xref.CrossRefPermitId);
+                    .FirstOrDefault(p =>
+                        p.PermitNo == xref.CrossRefPermitId && p.PermitTypeId == xref.CrossRefPermitTypeId);
                 if (tmp == null) continue;
 
                 xref.PermitNo = tmp.PermitNo;
@@ -162,6 +163,7 @@ namespace ePTW.Controllers.api
             Permit permit = _context.Permits
                 .Where(p => p.Id == id)
                 .Include(p => p.CrossRefs)
+                .Include(p => p.PermitType)
                 .Include(p => p.PermitPersons)
                 .Include(p => p.HeightPermit)
                 .Include(p => p.HotWorkPermit)
@@ -186,6 +188,7 @@ namespace ePTW.Controllers.api
             Permit permit = _context.Permits
                 .Where(p => p.PermitTypeId == permitType && p.PermitNo == permitNo)
                 .Include(p => p.CrossRefs)
+                .Include(p => p.PermitType)
                 .Include(p => p.PermitPersons)
                 .Include(p => p.HeightPermit)
                 .Include(p => p.HotWorkPermit)
@@ -217,19 +220,39 @@ namespace ePTW.Controllers.api
                     return BadRequest("Invalid employee");
 
                 // TODO: Get all employees under the dept incharge of this employee
+                // Get releaser of this employee...
 
-                string[] emps = _context.Employees.Where(
-                        e => e.CompCode == findEmp.CompCode &&
-                             e.WrkGrp == findEmp.WrkGrp &&
-                             e.UnitCode == findEmp.UnitCode &&
-                             e.DeptCode == findEmp.DeptCode &&
-                             e.StatCode == findEmp.StatCode
-                    )
-                    .Select(e => e.EmpUnqId)
-                    .ToArray();
+                List<string> relCode = _context.ReleaseStrategyLevels
+                    .Where(e => e.ReleaseStrategy == empUnqId)
+                    .Select(r => r.ReleaseCode).ToList();
+
+                List<string> relEmp = _context.ReleaseAuths
+                    .Where(r => relCode.Contains(r.ReleaseCode) && r.Active)
+                    .Select(e => e.EmpUnqId).ToList();
+
+                relEmp.Add(empUnqId);
+
+                List<string> relCodes = _context.ReleaseAuths
+                    .Where(e => relEmp.Contains(e.EmpUnqId))
+                    .Select(e => e.ReleaseCode).ToList();
+
+                List<string> emps = _context.ReleaseStrategyLevels
+                    .Where(r => relCodes.Contains(r.ReleaseCode))
+                    .Select(e => e.ReleaseStrategy).ToList();
+
+                //string[] emps = _context.Employees.Where(
+                //        e => e.CompCode == findEmp.CompCode &&
+                //             e.WrkGrp == findEmp.WrkGrp &&
+                //             e.UnitCode == findEmp.UnitCode &&
+                //             e.DeptCode == findEmp.DeptCode &&
+                //             e.StatCode == findEmp.StatCode
+                //    )
+                //    .Select(e => e.EmpUnqId)
+                //    .ToArray();
 
                 permits = _context.Permits
                     .Include(p => p.PermitPersons)
+                    .Include(p => p.PermitType)
                     .Include(x => x.CrossRefs)
                     .Include(p => p.HeightPermit)
                     .Include(p => p.HotWorkPermit)
@@ -245,6 +268,7 @@ namespace ePTW.Controllers.api
             {
                 permits = _context.Permits
                     .Include(p => p.PermitPersons)
+                    .Include(p => p.PermitType)
                     .Include(x => x.CrossRefs)
                     .Include(p => p.HeightPermit)
                     .Include(p => p.HotWorkPermit)
@@ -277,9 +301,12 @@ namespace ePTW.Controllers.api
                 permitDto.CloseElecInchEmpName = dto.CloseElecInchEmpName;
                 permitDto.CloseSafetyInchEmpName = dto.CloseSafetyInchEmpName;
 
-                foreach (PermitCrossRefDto xref in permitDto.CrossRefs)
-                    xref.PermitNo = dto.CrossRefs.FirstOrDefault(p => p.CrossRefPermitId == xref.CrossRefPermitId)
-                        ?.PermitNo;
+                //foreach (PermitCrossRefDto xref in permitDto.CrossRefs)
+                //{
+
+                //    xref.PermitNo = dto.CrossRefs.FirstOrDefault(p => p.CrossRefPermitId == xref.CrossRefPermitId)
+                //        ?.PermitNo;
+                //}
             }
 
 
@@ -319,6 +346,7 @@ namespace ePTW.Controllers.api
             permit.Id = GetMaxPermitId();
             permit.PermitNo = GetMaxPermitNo(permit.PermitTypeId);
 
+            permit.ExtendFlag = false;
 
             if (!ValidateEmp(permit.CreatedByEmpId))
                 return BadRequest("Invalid creator employee id.");

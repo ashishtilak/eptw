@@ -142,10 +142,14 @@ namespace ePTW.Controllers.api
                     EnableSsl = false
                 };
 
+                string strSubject = "ePTW Notification for " + permit.PermitType.PermitTypeDesc + " Permit No " +
+                                    permit.PermitNo + " from " + permit.Departments.DeptName + " / " +
+                                    permit.Stations.StatName;
+
                 var mail = new MailMessage
                 {
                     From = new MailAddress(mailAddress, "ePTW Portal"),
-                    Subject = "Notification from e-PTW portal for permit release",
+                    Subject = strSubject,
                     BodyEncoding = System.Text.Encoding.UTF8,
                     IsBodyHtml = true,
                     Body = body

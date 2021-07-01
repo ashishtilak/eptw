@@ -148,5 +148,10 @@ namespace ePTW.Dto
         public PermitElecIsolationDto ElecIsolationPermit { get; set; }
         public PermitColdWorkDto ColdWorkPermit { get; set; }
         public PermitVesselEntryDto VesselEntryPermit { get; set; }
+
+        public PermitTypeDto PermitType { get; set; }
+
+        public DateTime? OriginalToDate { get; set; }
+        public bool ExtendFlag { get; set; }
     }
 }

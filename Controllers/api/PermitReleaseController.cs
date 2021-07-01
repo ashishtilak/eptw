@@ -89,6 +89,7 @@ namespace ePTW.Controllers.api
                 case Modes.DeptInch: // Dept inch
                     permit = _context.Permits
                         .Include(p => p.PermitPersons)
+                        .Include(p => p.PermitType)
                         .Include(p => p.CrossRefs)
                         .Include(p => p.HeightPermit)
                         .Include(p => p.HotWorkPermit)
@@ -104,6 +105,7 @@ namespace ePTW.Controllers.api
                 case Modes.AreaInch: // Area inch
                     permit = _context.Permits
                         .Include(p => p.PermitPersons)
+                        .Include(p => p.PermitType)
                         .Include(p => p.CrossRefs)
                         .Include(p => p.HeightPermit)
                         .Include(p => p.HotWorkPermit)
@@ -111,15 +113,24 @@ namespace ePTW.Controllers.api
                         .Include(p => p.ElecIsolationPermit)
                         .Include(p => p.VesselEntryPermit)
                         .Where(p =>
-                            p.DeptInchRelStatus == ReleaseStatus.FullyReleased &&
                             p.AreaInchargeEmpId == empUnqId &&
                             p.AreaInchRelStatus == ReleaseStatus.InRelease).AsEnumerable()
                         .Select(_mapper.Map<Permit, PermitDto>)
                         .ToList();
+
+                    foreach (PermitDto permitDto in
+                        permit.ToList()
+                            .Where(permitDto => permitDto.PermitTypeId != PermitType.ElectricalIsolationPermit)
+                            .Where(permitDto => permitDto.DeptInchRelStatus != ReleaseStatus.FullyReleased))
+                    {
+                        permit.Remove(permitDto);
+                    }
+
                     break;
                 case Modes.ElecTech: // Elec Tech rel
                     permit = _context.Permits
                         .Include(p => p.PermitPersons)
+                        .Include(p => p.PermitType)
                         .Include(p => p.CrossRefs)
                         .Include(p => p.HeightPermit)
                         .Include(p => p.HotWorkPermit)
@@ -135,6 +146,7 @@ namespace ePTW.Controllers.api
                 case Modes.ElecInch: // Elec Inch Rel
                     permit = _context.Permits
                         .Include(p => p.PermitPersons)
+                        .Include(p => p.PermitType)
                         .Include(p => p.CrossRefs)
                         .Include(p => p.HeightPermit)
                         .Include(p => p.HotWorkPermit)
@@ -150,6 +162,7 @@ namespace ePTW.Controllers.api
                 case Modes.VpRelease: // Area inch
                     permit = _context.Permits
                         .Include(p => p.PermitPersons)
+                        .Include(p => p.PermitType)
                         .Include(p => p.CrossRefs)
                         .Include(p => p.HeightPermit)
                         .Include(p => p.HotWorkPermit)
@@ -167,6 +180,7 @@ namespace ePTW.Controllers.api
                 case Modes.FinalRelease:
                     permit = _context.Permits
                         .Include(p => p.PermitPersons)
+                        .Include(p => p.PermitType)
                         .Include(p => p.CrossRefs)
                         .Include(p => p.HeightPermit)
                         .Include(p => p.HotWorkPermit)
@@ -185,6 +199,7 @@ namespace ePTW.Controllers.api
                     // and dept inch id is null and dept inch close date is null
                     permit = _context.Permits
                         .Include(p => p.PermitPersons)
+                        .Include(p => p.PermitType)
                         .Include(p => p.CrossRefs)
                         .Include(p => p.HeightPermit)
                         .Include(p => p.HotWorkPermit)
@@ -207,6 +222,7 @@ namespace ePTW.Controllers.api
                 case Modes.CloseDept:
                     permit = _context.Permits
                         .Include(p => p.PermitPersons)
+                        .Include(p => p.PermitType)
                         .Include(p => p.CrossRefs)
                         .Include(p => p.HeightPermit)
                         .Include(p => p.HotWorkPermit)
@@ -224,6 +240,7 @@ namespace ePTW.Controllers.api
                 case Modes.CloseAreaInch:
                     permit = _context.Permits
                         .Include(p => p.PermitPersons)
+                        .Include(p => p.PermitType)
                         .Include(p => p.CrossRefs)
                         .Include(p => p.HeightPermit)
                         .Include(p => p.HotWorkPermit)
@@ -241,6 +258,7 @@ namespace ePTW.Controllers.api
                 case Modes.CloseElecTech:
                     permit = _context.Permits
                         .Include(p => p.PermitPersons)
+                        .Include(p => p.PermitType)
                         .Include(p => p.CrossRefs)
                         .Include(p => p.HeightPermit)
                         .Include(p => p.HotWorkPermit)
@@ -257,6 +275,7 @@ namespace ePTW.Controllers.api
                 case Modes.CloseElecInch:
                     permit = _context.Permits
                         .Include(p => p.PermitPersons)
+                        .Include(p => p.PermitType)
                         .Include(p => p.CrossRefs)
                         .Include(p => p.HeightPermit)
                         .Include(p => p.HotWorkPermit)
@@ -278,6 +297,7 @@ namespace ePTW.Controllers.api
 
                     permit = _context.Permits
                         .Include(p => p.PermitPersons)
+                        .Include(p => p.PermitType)
                         .Include(p => p.CrossRefs)
                         .Include(p => p.HeightPermit)
                         .Include(p => p.HotWorkPermit)
@@ -318,6 +338,9 @@ namespace ePTW.Controllers.api
                     .FirstOrDefault(e => e.EmpUnqId == permitDto.CloseElecInchEmpId)?.EmpName;
                 permitDto.CloseSafetyInchEmpName = _context.Employees
                     .FirstOrDefault(e => e.EmpUnqId == permitDto.CloseSafetyInchEmpId)?.EmpName;
+
+                permitDto.CreatedByEmpName = _context.Employees
+                    .FirstOrDefault(e => e.EmpUnqId == permitDto.CreatedByEmpId)?.EmpName;
 
                 foreach (PermitCrossRefDto xref in permitDto.CrossRefs)
                     xref.PermitNo = _context.Permits.FirstOrDefault(p => p.Id == xref.CrossRefPermitId)?.PermitNo;
@@ -535,7 +558,7 @@ namespace ePTW.Controllers.api
                     permit.AllowUserEdit = true;
                     permit.AllowSafetyEdit = true;
                     permit.AllowClose = false;
-                    
+
                     break;
 
                 case Modes.CloseSelf:
@@ -668,6 +691,17 @@ namespace ePTW.Controllers.api
                     permit.ClosedOn = DateTime.Now;
 
                     // TODO: Set flags
+                    // if flags are not set before safety, set it now
+                    permit.AreaInchCloseDate = permit.SafetyInchCloseDate;
+                    permit.DeptInchCloseDate = permit.SafetyInchCloseDate;
+                    permit.ElecTechCloseDate = permit.SafetyInchCloseDate;
+                    permit.ElecInchCloseDate = permit.SafetyInchCloseDate;
+
+                    permit.AreaInchCloseRelStatus = ReleaseStatus.FullyReleased;
+                    permit.DeptInchCloseRelStatus = ReleaseStatus.FullyReleased;
+                    permit.ElecTechCloseRelStatus = ReleaseStatus.FullyReleased;
+                    permit.ElecInchCloseRelStatus = ReleaseStatus.FullyReleased;
+
                     permit.CurrentState = PermitState.Closed;
                     permit.AllowUserEdit = false;
                     permit.AllowSafetyEdit = false;
