@@ -22,7 +22,10 @@ namespace ePTW
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            ConnectionString = configuration.GetConnectionString("defaultConnection");
+
+            //TODO: Change this in case of development testing
+            ConnectionString = configuration.GetConnectionString("devConnection");
+            //ConnectionString = configuration.GetConnectionString("defaultConnection");
         }
 
         public IConfiguration Configuration { get; }

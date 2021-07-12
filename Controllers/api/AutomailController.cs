@@ -107,6 +107,8 @@ namespace ePTW.Controllers.api
                     <body>
                 ";
 
+                bool isDev = Startup.ConnectionString.Contains("ash");
+
                 string sentTo = mode switch
                 {
                     Modes.AreaInch => _context.Employees.FirstOrDefault(e => e.EmpUnqId == permit.AreaInchargeEmpId)
@@ -115,10 +117,14 @@ namespace ePTW.Controllers.api
                         ?.Email,
                     Modes.ElecInch => _context.Employees.FirstOrDefault(e => e.EmpUnqId == permit.ElecInchargeEmpId)
                         ?.Email,
-                    Modes.FinalRelease => _context.Employees.FirstOrDefault(e => e.EmpUnqId == permit.SafetyInchargeEmpId)
-                        ?.Email,
+                    Modes.FinalRelease => "IPUGroup.Safety@jindalsaw.com",
                     _ => ""
                 };
+
+                if(isDev && mode == Modes.FinalRelease)
+                {
+                    sentTo = "mohit.parmar@jindalsaw.com";
+                }
 
                 string body = "Dear Sir, <br /><br /> " +
                               "Following permit requires your attention: <br/> <br />" +

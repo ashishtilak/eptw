@@ -98,7 +98,9 @@ namespace ePTW.Controllers.api
                         .Include(p => p.VesselEntryPermit)
                         .Where(p =>
                             p.DeptInchEmpId == empUnqId &&
-                            p.DeptInchRelStatus == ReleaseStatus.InRelease).AsEnumerable()
+                            p.DeptInchRelStatus == ReleaseStatus.InRelease &&
+                            p.SafetyInchargeRelStatus != ReleaseStatus.ReleaseRejected
+                            ).AsEnumerable()
                         .Select(_mapper.Map<Permit, PermitDto>)
                         .ToList();
                     break;
@@ -114,7 +116,8 @@ namespace ePTW.Controllers.api
                         .Include(p => p.VesselEntryPermit)
                         .Where(p =>
                             p.AreaInchargeEmpId == empUnqId &&
-                            p.AreaInchRelStatus == ReleaseStatus.InRelease).AsEnumerable()
+                            p.AreaInchRelStatus == ReleaseStatus.InRelease &&
+                            p.SafetyInchargeRelStatus != ReleaseStatus.ReleaseRejected).AsEnumerable()
                         .Select(_mapper.Map<Permit, PermitDto>)
                         .ToList();
 
@@ -139,7 +142,8 @@ namespace ePTW.Controllers.api
                         .Include(p => p.VesselEntryPermit)
                         .Where(p =>
                             p.ElecTechEmpId == empUnqId &&
-                            p.ElecTechRelStatus == ReleaseStatus.InRelease).AsEnumerable()
+                            p.ElecTechRelStatus == ReleaseStatus.InRelease &&
+                            p.SafetyInchargeRelStatus != ReleaseStatus.ReleaseRejected).AsEnumerable()
                         .Select(_mapper.Map<Permit, PermitDto>)
                         .ToList();
                     break;
@@ -155,7 +159,8 @@ namespace ePTW.Controllers.api
                         .Include(p => p.VesselEntryPermit)
                         .Where(p =>
                             p.ElecInchargeEmpId == empUnqId &&
-                            p.ElecInchRelStatus == ReleaseStatus.InRelease).AsEnumerable()
+                            p.ElecInchRelStatus == ReleaseStatus.InRelease &&
+                            p.SafetyInchargeRelStatus != ReleaseStatus.ReleaseRejected).AsEnumerable()
                         .Select(_mapper.Map<Permit, PermitDto>)
                         .ToList();
                     break;
@@ -172,7 +177,8 @@ namespace ePTW.Controllers.api
                         .Where(p =>
                             p.DeptInchRelStatus == ReleaseStatus.FullyReleased &&
                             p.VpEmpId == empUnqId &&
-                            p.VpRelStatus == ReleaseStatus.InRelease).AsEnumerable()
+                            p.VpRelStatus == ReleaseStatus.InRelease &&
+                            p.SafetyInchargeRelStatus != ReleaseStatus.ReleaseRejected).AsEnumerable()
                         .Select(_mapper.Map<Permit, PermitDto>)
                         .ToList();
                     break;
