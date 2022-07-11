@@ -229,12 +229,14 @@ namespace ePTW.Controllers.api
             foreach (ObsDto dto in obsDto.ToList())
             {
                 obsDto[i] = FillData(dto);
-                i++;
+
                 var obsImage = _context.ObsPhotos.FirstOrDefault(o => o.Id == dto.Id && o.ObsStatus == "O");
                 if (obsImage != null) obsDto[i].ObsImage = obsImage.PermitImage;
 
                 var compImage = _context.ObsPhotos.FirstOrDefault(o => o.Id == dto.Id && o.ObsStatus == "C");
                 if (compImage != null) obsDto[i].CompImage = compImage.PermitImage;
+
+                i++;
             }
 
 
