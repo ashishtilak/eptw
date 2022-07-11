@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ePTW.Models;
 
 namespace ePTW.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220607100054_Observations")]
+    partial class Observations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -360,78 +362,6 @@ namespace ePTW.Migrations
                     b.HasKey("Location");
 
                     b.ToTable("Locations");
-                });
-
-            modelBuilder.Entity("ePTW.Models.ObsHistory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("AddDt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("ComplianceDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ObsCatg")
-                        .HasMaxLength(2)
-                        .HasColumnType("nvarchar(2)");
-
-                    b.Property<DateTime>("ObsDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long>("ObsId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("ObsStatus")
-                        .HasMaxLength(1)
-                        .HasColumnType("nvarchar(1)");
-
-                    b.Property<string>("ObservedBy")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<string>("PersonResponsible")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<string>("ReleaseBy")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<DateTime?>("ReleaseDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ReleaseStatus")
-                        .HasMaxLength(1)
-                        .HasColumnType("nvarchar(1)");
-
-                    b.Property<DateTime?>("StatusUpdateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("StatusUpdateReleaseBy")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<DateTime?>("StatusUpdateReleaseDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("StatusUpdateReleaseStatus")
-                        .HasMaxLength(1)
-                        .HasColumnType("nvarchar(1)");
-
-                    b.Property<DateTime>("TargetDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserId")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ObsHistory");
                 });
 
             modelBuilder.Entity("ePTW.Models.ObsPhotos", b =>

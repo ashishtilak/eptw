@@ -7,7 +7,7 @@ using ePTW.Models;
 
 namespace ePTW.Dto
 {
-    public class AutoMapperProfile :Profile
+    public class AutoMapperProfile : Profile
     {
         public AutoMapperProfile()
         {
@@ -61,6 +61,11 @@ namespace ePTW.Dto
             CreateMap<PermitHistory, PermitHistoryDto>();
             CreateMap<PermitHistoryDto, PermitHistory>();
             CreateMap<Permit, PermitHistory>();
+
+            CreateMap<Observation, ObsDto>();
+            CreateMap<ObsDto, Observation>();
+            CreateMap<ObsHistory,ObsHistoryDto>();
+            CreateMap<ObsHistoryDto,ObsHistory>();
         }
     }
 }

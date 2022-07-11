@@ -391,7 +391,10 @@ namespace ePTW.Controllers.api
             if (emp == null)
                 return BadRequest("Invalid employee.");
 
-            Permit permit = _context.Permits.FirstOrDefault(p => p.Id == data.Id);
+            Permit permit = _context.Permits
+                .Include(p=>p.VesselEntryPermit)
+                .Include(p=>p.HotWorkPermit)
+                .FirstOrDefault(p => p.Id == data.Id);
             if (permit == null)
                 return BadRequest("Permit not found!");
 
@@ -461,6 +464,23 @@ namespace ePTW.Controllers.api
 
                     if (permit.ElecInchRelStatus != ReleaseStatus.InRelease)
                         errors.Add("Permit is not in elec inch release.");
+
+                    
+                    // CHECK IF ELECTRICAL INCHARGE HAS CHECKED VALUES OR NOT
+                    if(permit.PermitTypeId == PermitType.HotWorkPermit)
+                    {
+                        if(permit.HotWorkPermit.EquipmentEarthen  == 0 && 
+                           permit.HotWorkPermit.EquipmentIsolated == 0 &&
+                           permit.HotWorkPermit.WeldMachineConnection == 0)
+                            errors.Add("At least one check required for electrical incharge release ");
+                    }
+                    else if(permit.PermitTypeId == PermitType.VesselEntryPermit)
+                    {
+                        if(permit.VesselEntryPermit.EquipmentEarthen  == 0 && 
+                           permit.VesselEntryPermit.EquipmentIsolated == 0 &&
+                           permit.VesselEntryPermit.HandLampExtension == 0)
+                            errors.Add("At least one check required for electrical incharge release ");
+                    }
 
                     permit.ElecInchRelStatus = ReleaseStatus.FullyReleased;
                     permit.ElecInchRelDate = DateTime.Now;
@@ -553,7 +573,7 @@ namespace ePTW.Controllers.api
                     permit.SafetyInchargeEmpId = data.EmpUnqid;
                     permit.SafetyInchargeRelStatus = ReleaseStatus.ReleaseRejected;
                     permit.SafetyInchRelDate = DateTime.Now;
-                    permit.SafetyRemarks = data.Remarks;
+                    permit.SafetyRejectionRemarks = data.Remarks;
 
                     permit.DeptInchRelStatus = ReleaseStatus.InRelease;
                     permit.AreaInchRelStatus = ReleaseStatus.InRelease;
@@ -561,7 +581,7 @@ namespace ePTW.Controllers.api
                     permit.ElecInchRelStatus = ReleaseStatus.InRelease;
 
                     permit.CurrentState = PermitState.PartiallyReleased;
-                    permit.AllowUserEdit = true;
+                    permit.AllowUserEdit = false;
                     permit.AllowSafetyEdit = true;
                     permit.AllowClose = false;
 
@@ -698,15 +718,16 @@ namespace ePTW.Controllers.api
 
                     // TODO: Set flags
                     // if flags are not set before safety, set it now
-                    permit.AreaInchCloseDate = permit.SafetyInchCloseDate;
-                    permit.DeptInchCloseDate = permit.SafetyInchCloseDate;
-                    permit.ElecTechCloseDate = permit.SafetyInchCloseDate;
-                    permit.ElecInchCloseDate = permit.SafetyInchCloseDate;
 
-                    permit.AreaInchCloseRelStatus = ReleaseStatus.FullyReleased;
-                    permit.DeptInchCloseRelStatus = ReleaseStatus.FullyReleased;
-                    permit.ElecTechCloseRelStatus = ReleaseStatus.FullyReleased;
-                    permit.ElecInchCloseRelStatus = ReleaseStatus.FullyReleased;
+                    //permit.AreaInchCloseDate ??= permit.AreaInchCloseDate;
+                    //permit.DeptInchCloseDate ??= permit.SafetyInchCloseDate;
+                    //permit.ElecTechCloseDate ??= permit.SafetyInchCloseDate;
+                    //permit.ElecInchCloseDate ??= permit.SafetyInchCloseDate;
+                    
+                    //permit.AreaInchCloseRelStatus = ReleaseStatus.FullyReleased;
+                    //permit.DeptInchCloseRelStatus = ReleaseStatus.FullyReleased;
+                    //permit.ElecTechCloseRelStatus = ReleaseStatus.FullyReleased;
+                    //permit.ElecInchCloseRelStatus = ReleaseStatus.FullyReleased;
 
                     permit.CurrentState = PermitState.Closed;
                     permit.AllowUserEdit = false;
@@ -718,7 +739,6 @@ namespace ePTW.Controllers.api
                 default:
                     break;
             }
-
 
             if (errors.Count > 0)
                 return BadRequest(errors);

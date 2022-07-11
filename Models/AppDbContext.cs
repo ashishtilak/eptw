@@ -27,9 +27,9 @@ namespace ePTW.Models
 
             // find all entities having count of KeyAttributes greater than one.
             foreach (IMutableEntityType entity in modelBuilder.Model.GetEntityTypes()
-                .Where(t =>
-                    t.ClrType.GetProperties()
-                        .Count(p => p.CustomAttributes.Any(a => a.AttributeType == typeof(KeyAttribute))) > 1))
+                         .Where(t =>
+                             t.ClrType.GetProperties()
+                                 .Count(p => p.CustomAttributes.Any(a => a.AttributeType == typeof(KeyAttribute))) > 1))
             {
                 // get the keys in the appropriate order
                 var orderedKeys = entity.ClrType
@@ -107,5 +107,9 @@ namespace ePTW.Models
         public DbSet<ElecReleasers> ElecReleasers { get; set; }
 
         public DbSet<PermitHistory> PermitHistories { get; set; }
+
+        public DbSet<Observation> Observations { get; set; }
+        public DbSet<ObsPhotos> ObsPhotos { get; set; }
+        public DbSet<ObsHistory> ObsHistories { get; set; }
     }
 }

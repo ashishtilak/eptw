@@ -24,8 +24,8 @@ namespace ePTW
             Configuration = configuration;
 
             //TODO: Change this in case of development testing
-            ConnectionString = configuration.GetConnectionString("devConnection");
-            //ConnectionString = configuration.GetConnectionString("defaultConnection");
+            //ConnectionString = configuration.GetConnectionString("devConnection");
+            ConnectionString = configuration.GetConnectionString("defaultConnection");
         }
 
         public IConfiguration Configuration { get; }

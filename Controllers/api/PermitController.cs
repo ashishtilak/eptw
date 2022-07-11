@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -63,7 +64,9 @@ namespace ePTW.Controllers.api
                 .FirstOrDefault(e => e.EmpUnqId == permitDto.SafetyInchargeEmpId)?.EmpName;
 
             permitDto.CreatedByEmpName = _context.Employees
-                .FirstOrDefault(e => e.EmpUnqId == permitDto.CreatedByEmpId)?.EmpName;
+                .FirstOrDefault(e => e.EmpUnqId == permitDto.CreatedByEmpId)?.EmpName;            
+            permitDto.SelfCloseEmpName = _context.Employees
+                .FirstOrDefault(e => e.EmpUnqId == permitDto.SelfCloseEmpId)?.EmpName;
 
             permitDto.ResponsiblePersonName = _context.Employees
                 .FirstOrDefault(e => e.EmpUnqId == permitDto.ResponsiblePerson)?.EmpName;
@@ -401,6 +404,7 @@ namespace ePTW.Controllers.api
             permit.ElecInchRelStatus = ReleaseStatus.InRelease;
             permit.SafetyInchargeRelStatus = ReleaseStatus.InRelease;
             permit.SelfCloseRelStatus = ReleaseStatus.InRelease;
+            permit.VpRelStatus = ReleaseStatus.InRelease;
 
             using (IDbContextTransaction transaction = _context.Database.BeginTransaction())
             {

@@ -4,6 +4,7 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
 -->
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <_PublishTargetUrl>D:\_JSAW\_development\ePTW\ePTW_Publish</_PublishTargetUrl>
+    <_PublishTargetUrl>D:\_JSAW\_development\ePTW\eptw_copy\publish</_PublishTargetUrl>
+    <History>True|2022-07-11T11:19:57.1323979Z;True|2022-07-04T09:36:29.8819563+05:30;True|2022-07-01T15:55:51.1310976+05:30;True|2022-06-13T12:44:47.2729340+05:30;True|2022-06-11T17:44:46.2904873+05:30;True|2022-06-11T15:33:19.7143164+05:30;False|2022-06-11T15:32:02.6065505+05:30;True|2022-06-10T10:26:20.9624658+05:30;True|2022-06-09T16:25:08.8176046+05:30;True|2022-06-08T14:24:30.8014491+05:30;True|2022-06-07T15:36:32.7966130+05:30;True|2022-06-07T11:30:38.1740305+05:30;True|2022-06-07T11:11:30.2395382+05:30;True|2022-06-07T10:45:25.8096547+05:30;True|2022-06-06T12:24:08.6320688+05:30;True|2022-04-12T15:10:56.4887287+05:30;</History>
   </PropertyGroup>
 </Project>
